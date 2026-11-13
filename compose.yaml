@@ -1,0 +1,58 @@
+services:
+  web:
+  # Mantiene la build dal Dockerfile multi-stage
+    healthcheck:
+      # Esegue la verifica dentro il container Go.
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/"]
+      # Frequenza dei controlli
+      interval: 5s
+      # Tempo massimo concesso a ciascun controllo
+      timeout: 2s
+      # Fallimenti consecutivi necessari per dichiararlo unhealthy
+      retries: 3
+      # Periodo iniziale durante il quale i fallimenti non vengono conteggiati
+      start_period: 5s
+    build:
+      context: .
+    image: lab-go:compose
+    #    environment:
+    #  MESSAGGIO: "$MESSAGGIO_GO"
+    # Carica le variabili nel container.
+    # Percorso relativo alla directory del compose.yaml.
+    env_file:
+      - ./web.env
+    # Nessuna porta pubblicata: nginx lo raggiunge sulla rete condivisa
+    # ports:
+    # - "127.0.0.1:8000:80"
+    restart: unless-stopped
+    networks: 
+      - backend
+  frontend:
+  # Immagine pronta: per nginx non costruiamo un Dockerfile
+    image: nginx:alpine
+    ports:
+    # Porta 8080 dell'host → porta 80 di nginx
+      - "127.0.0.1:${PORTA_FRONTEND}:80"
+      # Monta il nostro file di configurazione in sola lettura.
+      # Il percorso sorgente è relativo alla directory del compose.yaml.
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      # Avvia web prima di frontend.
+      # Non garantisce che il server HTTP sia già pronto.
+    restart: unless-stopped
+    networks:
+            - backend
+            - ingresso
+    depends_on:
+        web: 
+          condition: service_healthy
+networks:
+  ingresso:
+    driver: bridge
+
+  backend:
+    driver: bridge
+
+  # Rete isolata dalla connettività esterna.
+  # Non impedisce la comunicazione tra i servizi collegati.
+    internal: true

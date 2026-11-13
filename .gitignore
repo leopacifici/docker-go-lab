@@ -1,0 +1,15 @@
+# Configurazioni locali: forniremo esempi separati nel repository
+.env
+web.env
+
+# Copie dei precedenti esercizi
+1_Dockerfile
+1_main.go
+ORG_compose.yaml
+
+# Eventuale binario compilato localmente
+/server
+
+# File temporanei dell’editor
+*.swp
+*~
