@@ -14,7 +14,8 @@ services:
       start_period: 5s
     build:
       context: .
-    image: lab-go:compose
+#    image: lab-go:compose
+    image: ghcr.io/leopacifici/docker-go-lab:v1.0.0
     #    environment:
     #  MESSAGGIO: "$MESSAGGIO_GO"
     # Carica le variabili nel container.
