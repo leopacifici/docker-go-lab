@@ -12,9 +12,6 @@ services:
       retries: 3
       # Periodo iniziale durante il quale i fallimenti non vengono conteggiati
       start_period: 5s
-    build:
-      context: .
-#    image: lab-go:compose
     image: ghcr.io/leopacifici/docker-go-lab:v1.0.0
     #    environment:
     #  MESSAGGIO: "$MESSAGGIO_GO"
