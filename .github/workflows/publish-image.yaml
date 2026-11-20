@@ -1,0 +1,38 @@
+# Nome visualizzato nella scheda Actions del repository
+name: Pubblica immagine Go
+# Si attiva quando viene inviato un tag che inizia con "v"
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+   pubblicazione:
+   # Macchina temporanea fornita da GitHub, con Docker disponibile
+    runs-on: ubuntu-24.04
+    # Permessi del token temporaneo assegnato al lavoro
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    # Scarica sul runner il codice del tag che ha attivato il workflow
+      - name: scarica repository
+        uses: actions/checkout@v6
+    # Autentica Docker usando un token temporaneo generato da GitHub
+      - name: login GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            printf '%s' "${GHCR_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    # Costruisce l'immagine Docker e la pubblica su GHCR
+      - name: costruisci e pubblica immagine
+        env:
+          IMAGE_NAME: ghcr.io/leopacifici/docker-go-lab
+        run: |
+          docker build \
+          --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+          --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+          -t "$IMAGE:$GITHUB_REF_NAME" .
+          docker push "$IMAGE:$GITHUB_REF_NAME"
+
+
+    
