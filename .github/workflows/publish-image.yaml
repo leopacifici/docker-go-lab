@@ -31,5 +31,5 @@ jobs:
           docker build \
             --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
             --label "org.opencontainers.image.revision=$GITHUB_SHA" \
-            -t "$IMAGE:$GITHUB_REF_NAME" .
-          docker push "$IMAGE:$GITHUB_REF_NAME" 
+            -t "$IMAGE_NAME:$GITHUB_REF_NAME" .
+          docker push "$IMAGE_NAME:$GITHUB_REF_NAME" 
